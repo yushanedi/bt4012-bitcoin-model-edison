@@ -1,7 +1,5 @@
 # Fraudulent Bitcoin Transaction Detection
 
-A leak-free, regime-aware ML pipeline for classifying Bitcoin transactions as illicit or licit on an Elliptic-style transaction graph. Full write-up: [`report.pdf`](report.pdf).
-
 ## Task
 
 Classify each of 157,101 transactions (234,355 directed payment-flow edges, 49 `time_step`s) as illicit (1) or licit (0) from 165 anonymized features (94 local + 71 neighborhood aggregates). Only 31,235 transactions are labeled (11.7% illicit). `train.csv` covers `time_step`s 1–35; `test.csv` covers `time_step`s 36–49 and carries **no labels available to us** — predictions for it are the deliverable (`submission.csv`), scored externally by ROC-AUC.
