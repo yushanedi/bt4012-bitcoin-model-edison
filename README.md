@@ -10,12 +10,12 @@ Classify each of 157,101 transactions (234,355 directed payment-flow edges, 49 `
 
 | File | Description |
 |---|---|
-| `analysis.ipynb` | Full pipeline: EDA, baselines (Logistic Regression, GCN, GAT, GIN, LightGBM), leak-free graph-structural feature engineering, domain-drift correction, horizon-matched rolling-origin CV, feature-count reduction, and the final seed-bagged XGBoost model. Run top to bottom from the project root (`DATA_DIR = '.'`). |
+| `analysis.ipynb` | Full pipeline: EDA, baselines (Logistic Regression, GCN, GAT, GIN, LightGBM), leak-free graph-structural feature engineering, domain-drift correction, horizon-matched rolling-origin CV, feature-count reduction, a seed-bagged XGBoost reference model, and the final ensemble (neighbour-score stacking, unlabeled train rows as weak licit examples, rank-averaged XGBoost / ExtraTrees / Random Forest members over several feature views). Run top to bottom from the project root (`DATA_DIR = '.'`). |
 | `train.csv` | Training data, `time_step`s 1–35 (141,772 rows; 31,235 labeled). |
 | `test.csv` | Scoring data, `time_step`s 36–49 (15,329 rows, unlabeled). |
 | `txs_edgelist.csv` | Directed transaction graph edges (234,355 rows), joins `train.csv`/`test.csv` via `txId`. |
 | `sample_submission.csv` | Required submission format (`index`, `target`). |
-| `submission.csv` | Final predictions — `target` is the predicted illicit probability for each `test.csv` row, produced by the frozen final model (seed-bagged XGBoost on 44 drift-corrected features). |
+| `submission.csv` | Final predictions — `target` is the final ensemble's rank-averaged illicit score for each `test.csv` row (higher = more likely illicit). |
 | `report.pdf` | 4-page technical report: methodology, results, and reflection. |
 
 ## Key result
@@ -33,4 +33,4 @@ Running the notebook end-to-end regenerates `submission.csv` from the current `t
 
 ## Note on data leakage
 
-`test.csv`'s labels were never used to choose features, tune hyperparameters, or select a model — every decision in the notebook and report was validated using rolling-origin cross-validation within `train.csv` alone. `test.csv` is read only to produce final predictions.
+No model is trained on `test.csv` labels — every training label comes from `train.csv` (labeled rows, plus unlabeled rows entered as weak licit examples). `test.csv` is read only for its features: to compute per-`time_step` graph and rank features, to form neighbour-score features, and to receive predictions.
